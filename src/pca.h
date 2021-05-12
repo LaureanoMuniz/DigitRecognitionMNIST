@@ -9,4 +9,6 @@ public:
 
     Eigen::MatrixXd transform(Matrix X);
 private:
+    Matrix projection;
+    unsigned int n_components;
 };

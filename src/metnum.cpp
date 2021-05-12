@@ -23,7 +23,7 @@ PYBIND11_MODULE(metnum, m) {
         py::arg("X"),
         py::arg("num_iter")=5000,
         py::arg("epsilon")=1e-16
-    );
+    ); 
     m.def(
         "get_first_eigenvalues", &get_first_eigenvalues,
         "Function that calculates eigenvector",
