@@ -7,7 +7,7 @@
 using namespace std;
 
 bool paircmp(pair<double,int> a, pair<double,int> b){
-    return a.first > b.first;
+    return a.first < b.first;
 }
 
 
@@ -33,22 +33,15 @@ IVector KNNClassifier::predict(Matrix X)
     for(unsigned k = 0; k < tests; ++k) {
         
         std::vector<pair<double, int>> neighbors(data);
-        for(unsigned i = 0; i < this->n_neighbors; ++i) {
-            neighbors[i] = {(X.row(k) - this->images.row(i)).squarednorm(), this->keys[i]};
+        for(unsigned i = 0; i < data; ++i) {
+            neighbors[i] = {(X.row(k) - this->images.row(i)).norm(), this->keys[i]};
         }
         
-        std::priority_queue<pair<double,int>,std::vector<pair<double,int>>,bool (&)(std::pair<double, int>, std::pair<double, int>)> priorityQ_neighbors(paircmp,neighbors);
-
-        for(unsigned i = this->n_neighbors; i < data; ++i) {
-            priorityQ_neighbors.push({(X.row(k) - this->images.row(i)).squarednorm(), this->keys[i]});
-            priorityQ_neighbors.pop();
-        }
-        
+        std::nth_element (neighbors.begin(), neighbors.begin()+this->n_neighbors, neighbors.end(),paircmp);
         std::map<int, unsigned> histogram;
-        for(unsigned i = 0; i < priorityQ_neighbors.size(); i++){
-            auto p = priorityQ_neighbors.top();
-            histogram[p.second]++;  
-            priorityQ_neighbors.pop();
+        for(unsigned i = 0; i < this->n_neighbors; i++){
+            auto p = neighbors[i];
+            histogram[p.second]++;
         } 
         int mode;
         unsigned amount = 0;
