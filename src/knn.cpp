@@ -2,8 +2,13 @@
 //#include <chrono>
 #include <iostream>
 #include "knn.h"
+#include <queue>
 
 using namespace std;
+
+bool paircmp(pair<double,int> a, pair<double,int> b){
+    return a.first > b.first;
+}
 
 
 KNNClassifier::KNNClassifier(unsigned int n_neighbors)
@@ -26,15 +31,25 @@ IVector KNNClassifier::predict(Matrix X)
     auto ret = IVector(tests);
 
     for(unsigned k = 0; k < tests; ++k) {
+        
         std::vector<pair<double, int>> neighbors(data);
-        for(unsigned i = 0; i < data; ++i) {
-            neighbors[i] = {(X.row(k) - this->images.row(i)).norm(), this->keys[i]};
+        for(unsigned i = 0; i < this->n_neighbors; ++i) {
+            neighbors[i] = {(X.row(k) - this->images.row(i)).squarednorm(), this->keys[i]};
         }
-        sort(neighbors.begin(), neighbors.end());
-        neighbors.erase(neighbors.begin() + this->n_neighbors, neighbors.end());
+        
+        std::priority_queue<pair<double,int>,std::vector<pair<double,int>>,bool (&)(std::pair<double, int>, std::pair<double, int>)> priorityQ_neighbors(paircmp,neighbors);
 
+        for(unsigned i = this->n_neighbors; i < data; ++i) {
+            priorityQ_neighbors.push({(X.row(k) - this->images.row(i)).squarednorm(), this->keys[i]});
+            priorityQ_neighbors.pop();
+        }
+        
         std::map<int, unsigned> histogram;
-        for(auto p : neighbors) histogram[p.second]++;
+        for(unsigned i = 0; i < priorityQ_neighbors.size(); i++){
+            auto p = priorityQ_neighbors.top();
+            histogram[p.second]++;  
+            priorityQ_neighbors.pop();
+        } 
         int mode;
         unsigned amount = 0;
         for(auto p : histogram) if(p.second > amount) {
