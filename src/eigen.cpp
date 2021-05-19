@@ -8,15 +8,24 @@ using namespace std;
 
 
 pair<double, Vector> power_iteration(const Matrix& X, unsigned num_iter, double eps)
-{
+{ 
     Vector b = Vector::Random(X.cols());
+    Vector b_anterior;
+    double coseno;
     b /= b.norm();
     while(num_iter --> 0) {
+        b_anterior = b;
         b = X * b;
         b /= b.norm();
-    }
+        coseno = b.dot(b_anterior);
 
+        if ((1-eps) < coseno && coseno <= 1) {
+            cout << "Termine en la iteracion" << num_iter << endl;
+            break;
+        }
+    }
     return make_pair(b.dot(X*b), b);
+    
 }
 
 pair<Vector, Matrix> get_first_eigenvalues(const Matrix& X, unsigned num, unsigned num_iter, double eps)
