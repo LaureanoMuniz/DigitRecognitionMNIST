@@ -9,7 +9,7 @@ namespace py=pybind11;
 // el primer argumento es el nombre...
 PYBIND11_MODULE(metnum, m) {
     py::class_<KNNClassifier>(m, "KNNClassifier")
-        .def(py::init<unsigned int>())
+        .def(py::init<unsigned int, bool>(), py::arg("n_neighbors"),py::arg("conPeso")= false)
         .def("fit", &KNNClassifier::fit)
         .def("predict", &KNNClassifier::predict);
 

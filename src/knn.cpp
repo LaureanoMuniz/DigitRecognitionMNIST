@@ -11,9 +11,10 @@ bool paircmp(pair<double,int> a, pair<double,int> b){
 }
 
 
-KNNClassifier::KNNClassifier(unsigned int n_neighbors)
+KNNClassifier::KNNClassifier(unsigned int n_neighbors, bool conPeso)
 {
     this->n_neighbors = n_neighbors;
+    this->conPeso = conPeso;
 }
 
 void KNNClassifier::fit(Matrix X, IVector y)
@@ -34,17 +35,22 @@ IVector KNNClassifier::predict(Matrix X)
         
         std::vector<pair<double, int>> neighbors(data);
         for(unsigned i = 0; i < data; ++i) {
-            neighbors[i] = {(X.row(k) - this->images.row(i)).norm(), this->keys[i]};
+            neighbors[i] = {(X.row(k) - this->images.row(i)).squaredNorm(), this->keys[i]};
         }
         
         std::nth_element (neighbors.begin(), neighbors.begin()+this->n_neighbors, neighbors.end(),paircmp);
-        std::map<int, unsigned> histogram;
+        std::map<int, double> histogram;
         for(unsigned i = 0; i < this->n_neighbors; i++){
             auto p = neighbors[i];
-            histogram[p.second]++;
+            if (!conPeso){
+                histogram[p.second]++;
+            }
+            else{
+                histogram[p.second] += 1/(p.first);
+            }
         } 
         int mode;
-        unsigned amount = 0;
+        double amount = 0;
         for(auto p : histogram) if(p.second > amount) {
             amount = p.second;
             mode = p.first;
