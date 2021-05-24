@@ -30,9 +30,9 @@ IVector KNNClassifier::predict(Matrix X)
     unsigned tests = X.rows();
     unsigned data = this->images.rows();
     auto ret = IVector(tests);
-
+   
+    #pragma omp parallel for
     for(unsigned k = 0; k < tests; ++k) {
-        
         std::vector<pair<double, int>> neighbors(data);
         for(unsigned i = 0; i < data; ++i) {
             neighbors[i] = {(X.row(k) - this->images.row(i)).squaredNorm(), this->keys[i]};
