@@ -42,17 +42,21 @@ def get_KFold_sets(x,y,K=5):
 
 def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
 	accspar = []
+	this_time = 0
 	for k in tqdm(range(1,16,1)):
 	    for alpha in range(25,36):
 	        acc = 0
 	        for i in range(len(X_trains)):
 	            pca = metnum.PCA(alpha)
 	            pca.fit(X_trains[i])
+	            start = time.process_time()
 	            X_train_transformada = pca.transform(X_trains[i])
 	            X_val_transformada = pca.transform(X_vals[i])
 	            clf = metnum.KNNClassifier(k, conPeso)
 	            clf.fit(X_train_transformada,Y_trains[i])
 	            y_pred = clf.predict(X_val_transformada)
+	            end = time.process_time()
+	            this_time += (end-start)
 	            acc += sk.metrics.accuracy_score(Y_vals[i], y_pred)
 	        acc = acc/len(X_trains)
 	        accspar.append((acc,k,alpha)) 
@@ -60,7 +64,8 @@ def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
 	accspar.sort(reverse = True)
 	mejores5pares = accspar[:5]
 	minimosf1 = minimizarF1(mejores5pares,X_trains,Y_trains,X_vals,Y_vals,conPeso)
-	return minimosf1[0]
+	parOptimoConInfo = (minimosf1[0][2],minimosf1[0][3],minimosf1[0][1],minimosf1[0][0]) ### (k ideal, alpha ideal, accuracy del ideal, minimo f1 del ideal)
+	return parOptimoConInfo, this_time 
 
 def minimizarF1(mejores5,X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
 	minimosf1 = []
