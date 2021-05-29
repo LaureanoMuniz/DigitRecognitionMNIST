@@ -40,7 +40,7 @@ def get_KFold_sets(x,y,K=5):
     return (X_trains,Y_trains,X_vals,Y_vals)
 
 
-def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
+def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False, heatmap=False):
 	accspar = []
 	this_time = 0
 	for k in tqdm(range(1,16,1)):
@@ -60,6 +60,9 @@ def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
 	            acc += sk.metrics.accuracy_score(Y_vals[i], y_pred)
 	        acc = acc/len(X_trains)
 	        accspar.append((acc,k,alpha)) 
+
+    if(heatmap):
+        plotheatmap(accspar)
 
 	accspar.sort(reverse = True)
 	mejores5pares = accspar[:5]
@@ -85,3 +88,19 @@ def minimizarF1(mejores5,X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
 		minimosf1.append((np.amin(f1_scorePorClase),tupla[0],tupla[1],tupla[2]))
 	minimosf1.sort(reverse = True)
 	return(minimosf1)
+
+def plotheatmap(accspar):
+    mat = np.zeros((15,11))
+    ks = np.arange(1,16)
+    alphas = np.arange(25,36)
+    for tupla in accspar:
+        mat[tupla[1]-1][tupla[2]-25] = tupla[0]
+    fig,ax = plt.subplots()
+    im = ax.imshow(mat)
+    ax.set_yticks(np.arange(15))
+    ax.set_xticks(np.arange(11))
+    ax.set_yticklabels(ks)
+    ax.set_xticklabels(alphas)
+    ax.set_xlabel("alpha")
+    ax.set_ylabel("k")
+    ax.figure.colorbar(im)

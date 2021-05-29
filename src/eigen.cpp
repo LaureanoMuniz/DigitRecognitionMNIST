@@ -20,7 +20,7 @@ pair<double, Vector> power_iteration(const Matrix& X, unsigned num_iter, double 
         coseno = b.dot(b_anterior);
 
         if ((1-eps) < coseno && coseno <= 1) {
-            cout << "Termine en la iteracion" << num_iter << endl;
+            //cout << "Termine en la iteracion" << num_iter << endl;
             break;
         }
     }
