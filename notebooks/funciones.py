@@ -61,8 +61,8 @@ def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False, heatmap=Fa
 	        acc = acc/len(X_trains)
 	        accspar.append((acc,k,alpha)) 
 
-    if(heatmap):
-        plotheatmap(accspar)
+	if(heatmap):
+         plotheatmap(accspar)
 
 	accspar.sort(reverse = True)
 	mejores5pares = accspar[:5]
@@ -104,3 +104,14 @@ def plotheatmap(accspar):
     ax.set_xlabel("alpha")
     ax.set_ylabel("k")
     ax.figure.colorbar(im)
+
+
+def Test(tupla, X, Y, X_test, conPeso=False):
+	pca = metnum.PCA(tupla[1])
+	pca.fit(X)
+	X_transformada = pca.transform(X)
+	X_test_transformada = pca.transform(X_test)
+	clf = metnum.KNNClassifier(tupla[0], conPeso)
+	clf.fit(X_transformada,Y)
+	Y_pred = clf.predict(X_test_transformada)
+	return Y_pred
