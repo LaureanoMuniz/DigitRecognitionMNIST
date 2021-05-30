@@ -7,9 +7,9 @@ from sklearn import metrics
 import time
 import metnum
 
-def construir_dataset(numeroElementos = 42000):
+def construir_dataset(numeroElementos = 42000, seed = 42):
 	df_train = pd.read_csv("../data/train.csv")
-	df_train = sk.utils.shuffle(df_train, random_state = 42)
+	df_train = sk.utils.shuffle(df_train, random_state = seed)
 	cutting_point = len(df_train) - (len(df_train)//5)
 	df_test = df_train[cutting_point:]
 	df_train = df_train[:cutting_point]
@@ -67,8 +67,8 @@ def encontrarParOptimo(X_trains,Y_trains,X_vals,Y_vals,conPeso=False, heatmap=Fa
 	accspar.sort(reverse = True)
 	mejores5pares = accspar[:5]
 	minimosf1 = minimizarF1(mejores5pares,X_trains,Y_trains,X_vals,Y_vals,conPeso)
-	parOptimoConInfo = (minimosf1[0][2],minimosf1[0][3],minimosf1[0][1],minimosf1[0][0]) ### (k ideal, alpha ideal, accuracy del ideal, minimo f1 del ideal)
-	return parOptimoConInfo, this_time 
+	parOptimo = (minimosf1[0][2],minimosf1[0][3]) ### (k ideal, alpha ideal)
+	return parOptimo, this_time 
 
 def minimizarF1(mejores5,X_trains,Y_trains,X_vals,Y_vals,conPeso=False):
 	minimosf1 = []
