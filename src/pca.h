@@ -7,7 +7,11 @@ public:
 
     void fit(Matrix X);
 
-    Eigen::MatrixXd transform(Matrix X);
+    Matrix transform(Matrix X);
+
+    Matrix get_projection();
+
+    static PCA from_proj(int, Matrix);
 private:
     Matrix projection;
     unsigned int n_components;

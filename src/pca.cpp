@@ -21,7 +21,17 @@ void PCA::fit(Matrix X)
 
 
 
-MatrixXd PCA::transform(Matrix X)
+Matrix PCA::transform(Matrix X)
 {
     return X * this->projection;
+}
+
+Matrix PCA::get_projection() {
+    return this->projection;
+}
+
+PCA PCA::from_proj(int alpha, Matrix proj) {
+    PCA res(alpha);
+    res.projection = proj;
+    return res;
 }
